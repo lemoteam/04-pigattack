@@ -511,7 +511,7 @@ GameObject:
   - component: {fileID: 484312437}
   - component: {fileID: 484312436}
   m_Layer: 8
-  m_Name: Emmi
+  m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -544,6 +544,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cam: {fileID: 282840813}
   agent: {fileID: 484312437}
+  isAnimated: 0
 --- !u!195 &484312437
 NavMeshAgent:
   m_ObjectHideFlags: 0
