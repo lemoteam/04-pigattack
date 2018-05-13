@@ -19,7 +19,6 @@ public class PlayerController : MonoBehaviour
 			{
 				agent.SetDestination(hit.point);
 				isAnimated = true;
-				Debug.Log(agent.pathPending);
 			}
 		}
 		
