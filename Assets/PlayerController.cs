@@ -4,7 +4,6 @@ using UnityEngine.AI;
 public class PlayerController : MonoBehaviour
 {
 
-	public Camera cam;
 	public NavMeshAgent agent;
 	public bool isAnimated = false;
 	
@@ -26,7 +25,6 @@ public class PlayerController : MonoBehaviour
 
 	public void displaceAgent(Vector3 destination)
 	{
-		var test = destination;
 		agent.SetDestination(destination);
 		isAnimated = true;
 	}

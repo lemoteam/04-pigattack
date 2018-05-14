@@ -9,15 +9,30 @@ public class PlayerManager : MonoBehaviour
 	private PlayerManager instance;
 	public GameObject player;
 	public GameObject pursuer;
-	public Camera cam;
+	public int index = 0;
 	public int nbPursuer;
 	public int radiusPursuer;
 	private List<GameObject> pursuerList;
+	private List<Vector3> checkpointPositions;
+	private GameObject[] checkpoints;
 	
 	private void Awake()
 	{
 		instance = this;
+		
+		// Set new list
 		pursuerList = new List<GameObject>();
+		
+		// Get all points positions
+		checkpointPositions = new List<Vector3>();
+		checkpoints = GameObject.FindGameObjectsWithTag("Checkpoint");
+		
+		foreach (GameObject checkpoint in checkpoints)
+		{
+			checkpointPositions.Add(checkpoint.transform.position);
+		}
+		
+		// Create Pursuer
 		createPursuer();
 	}
 
@@ -35,10 +50,6 @@ public class PlayerManager : MonoBehaviour
 			// Set position
 			pursuerObj.transform.parent = transform;
 			pursuerObj.transform.position = position;
-			
-			// Set camera
-			var controller = pursuerObj.GetComponent<PlayerController>();
-			controller.cam = cam;		
 			
 			pursuerList.Add(pursuerObj);
 		}
@@ -66,28 +77,72 @@ public class PlayerManager : MonoBehaviour
 	private void Update () {
 		if (Input.GetMouseButtonDown(0))
 		{
-			var ray = cam.ScreenPointToRay(Input.mousePosition);
-			RaycastHit hit;
-	
-			if (Physics.Raycast(ray, out hit))
+			setCheckpointActive(this.index);
+			goToCheckpoint(this.index);
+			if (this.index < this.checkpoints.Length - 1)
 			{
-				var playerController = player.GetComponent<PlayerController>();
-				playerController.displaceAgent(hit.point);
+				this.index++;
+			}
+			else
+			{
+				this.index = 0;
+			}
+		}
+	}
+
+	private void goToCheckpoint(int index)
+	{
+		var playerController = player.GetComponent<PlayerController>();
+		playerController.displaceAgent(checkpointPositions[index]);
+		
+		instance.StopCoroutine(displacePursuer(checkpointPositions[index]));
+		instance.StartCoroutine(displacePursuer(checkpointPositions[index]));
+	}
+
+
+	private void setCheckpointActive(int index)
+	{
+		var i = 0;
+		
+		foreach (GameObject checkpoint in checkpoints)
+		{
+			if (i != index) 
+			{
+				setCheckpointColor(checkpoint, Color.white, Color.white);
+			}
+			else
+			{
+				setCheckpointColor(checkpoint, Color.blue, Color.blue);
 			}
 			
-			instance.StopCoroutine(displacePursuer(hit));
-			instance.StartCoroutine(displacePursuer(hit));
+			i++;
 		}
+		
+	}
+
+
+	private void setCheckpointColor(GameObject checkpoint, Color color, Color specular)
+	{
+		//Fetch the Renderer from the GameObject
+		Renderer rend = checkpoint.GetComponent<Renderer>();
+
+		//Set the main Color of the Material to green
+		rend.material.shader = Shader.Find("_Color");
+		rend.material.SetColor("_Color", color);
+
+		//Find the Specular shader and change its Color to red
+		rend.material.shader = Shader.Find("Specular");
+		rend.material.SetColor("_SpecColor", specular);
 	}
 	
 	
-	private IEnumerator displacePursuer(RaycastHit hit)
+	private IEnumerator displacePursuer(Vector3 playerPosition)
 	{
 		yield return new WaitForSeconds(1.5f);
 		foreach (var pursuer in pursuerList.Select((value, i) => new { i, value }))
 		{
 			var playerController = pursuer.value.GetComponent<PlayerController>();
-			var position = hit.point + calcArroundPosition(pursuer.i, radiusPursuer);
+			var position = playerPosition + calcArroundPosition(pursuer.i, radiusPursuer);
 			playerController.displaceAgent(position);
 		}
 	}
