@@ -10,19 +10,6 @@ public class PlayerController : MonoBehaviour
 	
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetMouseButtonDown(0))
-		{
-			var ray = cam.ScreenPointToRay(Input.mousePosition);
-			RaycastHit hit;
-	
-			if (Physics.Raycast(ray, out hit))
-			{
-				agent.SetDestination(hit.point);
-				isAnimated = true;
-				Debug.Log(agent.pathPending);
-			}
-		}
-		
 		if (!agent.pathPending && isAnimated)
 		{
 			if (agent.remainingDistance <= agent.stoppingDistance)
@@ -34,5 +21,11 @@ public class PlayerController : MonoBehaviour
 				}
 			}
 		}
+	}
+
+	public void displaceAgent(Vector3 destination)
+	{
+		agent.SetDestination(destination);
+		isAnimated = true;
 	}
 }

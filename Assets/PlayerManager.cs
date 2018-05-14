@@ -1,23 +1,28 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
+	private PlayerManager instance;
 	public GameObject player;
 	public GameObject pursuer;
 	public Camera cam;
 	public int nbPursuer;
 	public int radiusPursuer;
-	
+	private List<GameObject> pursuerList;
 	
 	private void Awake()
 	{
+		instance = this;
+		pursuerList = new List<GameObject>();
 		createPursuer();
 	}
 
-	void createPursuer()
+	
+	private void createPursuer()
 	{
 		for (var i = 0; i < nbPursuer; i++)
 		{
@@ -25,7 +30,7 @@ public class PlayerManager : MonoBehaviour
 			var position = calcArroundPosition(i, radiusPursuer) + player.transform.position;
 			
 			// Instantiate
-			GameObject pursuerObj = Instantiate(pursuer);
+			var pursuerObj = Instantiate(pursuer);
 			
 			// Set position
 			pursuerObj.transform.parent = transform;
@@ -33,7 +38,9 @@ public class PlayerManager : MonoBehaviour
 			
 			// Set camera
 			var controller = pursuerObj.GetComponent<PlayerController>();
-			controller.cam = cam;
+			controller.cam = cam;		
+			
+			pursuerList.Add(pursuerObj);
 		}
 	}
 
@@ -48,8 +55,40 @@ public class PlayerManager : MonoBehaviour
 	}
 	
 	
-	private static float ToSingle(double value)
+	private float ToSingle(double value)
 	{
 		return (float)value;
+	}
+	
+	
+	
+	// Update is called once per frame
+	private void Update () {
+		if (Input.GetMouseButtonDown(0))
+		{
+			var ray = cam.ScreenPointToRay(Input.mousePosition);
+			RaycastHit hit;
+	
+			if (Physics.Raycast(ray, out hit))
+			{
+				var playerController = player.GetComponent<PlayerController>();
+				playerController.displaceAgent(hit.point);
+			}
+			
+			instance.StopCoroutine(displacePursuer(hit));
+			instance.StartCoroutine(displacePursuer(hit));
+		}
+	}
+	
+	
+	private IEnumerator displacePursuer(RaycastHit hit)
+	{
+		yield return new WaitForSeconds(1.5f);
+		foreach (var pursuer in pursuerList.Select((value, i) => new { i, value }))
+		{
+			var playerController = pursuer.value.GetComponent<PlayerController>();
+			var position = hit.point + calcArroundPosition(pursuer.i, radiusPursuer);
+			playerController.displaceAgent(position);
+		}
 	}
 }
