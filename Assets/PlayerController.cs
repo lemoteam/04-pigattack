@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviour
 
 	public void displaceAgent(Vector3 destination)
 	{
+		var test = destination;
 		agent.SetDestination(destination);
 		isAnimated = true;
 	}
