@@ -77,7 +77,7 @@ public class PlayerManager : MonoBehaviour
 	private void Update () {
 		if (Input.GetMouseButtonDown(0))
 		{
-			setCheckpointActive(this.index);
+			
 			goToCheckpoint(this.index);
 			if (this.index < this.checkpoints.Length - 1)
 			{
@@ -90,11 +90,11 @@ public class PlayerManager : MonoBehaviour
 		}
 	}
 
-	private void goToCheckpoint(int index)
+	public void goToCheckpoint(int index)
 	{
 		var playerController = player.GetComponent<PlayerController>();
 		playerController.displaceAgent(checkpointPositions[index]);
-		
+		setCheckpointActive(index);
 		instance.StopCoroutine(displacePursuer(checkpointPositions[index]));
 		instance.StartCoroutine(displacePursuer(checkpointPositions[index]));
 	}
