@@ -7,6 +7,7 @@ TagManager:
   - Checkpoint
   - min
   - max
+  - index
   layers:
   - Default
   - TransparentFX

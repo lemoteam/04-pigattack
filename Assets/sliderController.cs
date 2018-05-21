@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class sliderController : MonoBehaviour {
-    private GameObject max;
-    private GameObject min;
 	private GameObject indicator;
-	private GameObject[] checkpoint;
-	private float checkpointL;
+	private GameObject indicatorS;
+	private GameObject[] indexes;
+	//private GameObject[] checkpoint;
+	//private float checkpointL;
 	private float posIndex;
 	public PlayerManager playerManager;
 	private float previousIndex = -1;
@@ -15,32 +15,35 @@ public class sliderController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		indicator = GameObject.FindWithTag("Player");
-		max = GameObject.FindWithTag("max");
-		min = GameObject.FindWithTag("min");
-		checkpoint = GameObject.FindGameObjectsWithTag("Checkpoint");
-		checkpointL = checkpoint.Length;
-		posIndex = 100 / checkpointL;
-		Debug.Log("checkpoint l :" + posIndex);
+		indicatorS = GameObject.Find("indicatorS");
+		indexes = GameObject.FindGameObjectsWithTag("index");
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
-		if (indicator && indicator.GetComponent<MeshRenderer>().enabled )
-		{
-			var mapValue = Map(0, 100, min.transform.position.x, max.transform.position.x, indicator.transform.position.x);
-			/* Debug.Log("<color=red> min position : "+ min.transform.position.x+"</color>");
-			Debug.Log("<color=yellow> max position : "+ max.transform.position.x+"</color>");
-			Debug.Log("<color=white> indicator" + indicator.transform.position.x + "</color>");
-			Debug.Log("<color=grey> map " + mapValue + "</color>"); */
-			var currentIndex = Mathf.Ceil(mapValue / posIndex);
-			;
-			if (currentIndex > 0 && previousIndex != currentIndex)
+		if (indicator && indicatorS.GetComponent<MeshRenderer>().enabled )
+		{	
+			for (int i = 0; i < indexes.Length; i++)
 			{
-				Debug.Log("<color=grey> currentIndex :  " + currentIndex + "</color>");
-				playerManager.goToCheckpoint((int)currentIndex - 1);
-				previousIndex = currentIndex;
+				var dist = indexes[i].transform.position.x - indicator.transform.position.x;
+				if (dist < 2 && dist > 0)
+				{
+					var currentIndex = i;
+					if (previousIndex != currentIndex)
+					{
+						playerManager.goToCheckpoint(currentIndex);
+						previousIndex = currentIndex;
+					}
+					//DEBUG
+					setIndicColor(indexes[i],Color.blue, Color.blue);
+				} else {
+					setIndicColor(indexes[i],Color.white, Color.white);
+				}
 			}
+			Debug.Log("<color=yellow> distance indic 1 : "+ (indexes[1].transform.position.x - indicator.transform.position.x) +"</color>");
+			Debug.Log("<color=white> distance indic 2: " + (indexes[2].transform.position.x - indicator.transform.position.x) + "</color>");
+			Debug.Log("<color=red> distance indic 3 : "+(indexes[0].transform.position.x - indicator.transform.position.x) +"</color>");
 		}
 	}
 	
@@ -52,5 +55,18 @@ public class sliderController : MonoBehaviour {
 		} else {
 			return (to - from) * ((value - from2) / (to2 - from2)) + from;
 		}
+	}
+	private void setIndicColor(GameObject indic, Color color, Color specular)
+	{
+		//Fetch the Renderer from the GameObject
+		Renderer rend = indic.GetComponent<Renderer>();
+
+		//Set the main Color of the Material to green
+		rend.material.shader = Shader.Find("_Color");
+		rend.material.SetColor("_Color", color);
+
+		//Find the Specular shader and change its Color to red
+		rend.material.shader = Shader.Find("Specular");
+		rend.material.SetColor("_SpecColor", specular);
 	}
 }
