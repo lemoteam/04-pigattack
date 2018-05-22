@@ -10,15 +10,14 @@ public class sliderController : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		indicator = GameObject.FindWithTag("Player");
-		indicatorS = GameObject.Find("indicatorS");
+		indicator = GameObject.FindWithTag("indicatorS");
 		indexes = GameObject.FindGameObjectsWithTag("index");
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
-		if (indicator && indicatorS.GetComponent<MeshRenderer>().enabled )
+		if (indicator && indicator.GetComponent<MeshRenderer>().enabled )
 		{
 			var minimum = float.MaxValue;
 			for (int i = 0; i < indexes.Length; i++)
