@@ -7,12 +7,11 @@ public class sliderController : MonoBehaviour {
 	private float posIndex;
 	public PlayerManager playerManager;
 	private float previousIndex = -1;
-	private float minimum;
+	
 	// Use this for initialization
 	void Start () {
 		indicator = GameObject.FindWithTag("indicatorS");
 		indexes = GameObject.FindGameObjectsWithTag("index");
-		minimum = float.MaxValue;
 	}
 	
 	// Update is called once per frame
@@ -20,6 +19,7 @@ public class sliderController : MonoBehaviour {
 	{
 		if (indicator && indicator.GetComponent<MeshRenderer>().enabled )
 		{
+			var minimum = float.MaxValue;
 			for (int i = 0; i < indexes.Length; i++)
 			{
 				var num = Vector3.Distance(indexes[i].transform.position, indicator.transform.position);
