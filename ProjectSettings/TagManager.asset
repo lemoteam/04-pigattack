@@ -8,6 +8,7 @@ TagManager:
   - min
   - max
   - index
+  - indicatorS
   layers:
   - Default
   - TransparentFX
